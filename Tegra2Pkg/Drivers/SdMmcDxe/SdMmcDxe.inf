@@ -1,0 +1,38 @@
+#/** @file
+#
+#  tegra20 sdmmc dxe
+#
+#  Copyright (c) 2026, Leandro Friedrich.
+#  SPDX-License-Identifier: GPL-2.0-or-later
+#
+#**/
+
+[Defines]
+  INF_VERSION                    = 0x00010019
+  BASE_NAME                      = SdMmcDxe
+  FILE_GUID                      = 603cdc2f-bedc-49be-bb88-53fe3937f68d
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = SdMmcInitialize
+
+[Sources.common]
+  SdMmcDxe.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  Tegra2Pkg/Tegra2Pkg.dec
+
+[LibraryClasses]
+  BaseLib
+  DebugLib
+  IoLib
+  NonDiscoverableDeviceRegistrationLib
+  UefiBootServicesTableLib
+  UefiDriverEntryPoint
+
+[Protocols]
+  gEdkiiSdMmcOverrideProtocolGuid               ## PRODUCES
+
+[Depex]
+  TRUE
