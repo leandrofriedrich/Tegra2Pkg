@@ -53,6 +53,8 @@
   UefiDecompressLib|MdePkg/Library/BaseUefiDecompressLib/BaseUefiDecompressLib.inf
   CpuLib|MdePkg/Library/BaseCpuLib/BaseCpuLib.inf
 
+  FrameBufferConfigLib|Tegra2Pkg/Library/FrameBufferConfigLib/FrameBufferConfigLib.inf
+
   UefiLib|MdePkg/Library/UefiLib/UefiLib.inf
   HobLib|MdePkg/Library/DxeHobLib/DxeHobLib.inf
   UefiRuntimeServicesTableLib|MdePkg/Library/UefiRuntimeServicesTableLib/UefiRuntimeServicesTableLib.inf
@@ -351,10 +353,10 @@
   gArmTokenSpaceGuid.PcdGicInterruptInterfaceBase|0x50040100
 
   # Framebuffer
-  gTegra2TokenSpaceGuid.PcdFrameBufferAddress|0x1F800000
-  gTegra2TokenSpaceGuid.PcdFrameBufferWidth|1024
-  gTegra2TokenSpaceGuid.PcdFrameBufferHeight|600
-  gTegra2TokenSpaceGuid.PcdFrameBufferBitsPerPixel|16
+  gTegra2TokenSpaceGuid.PcdMipiFrameBufferAddress|0x1F800000
+  gTegra2TokenSpaceGuid.PcdMipiFrameBufferWidth|1024
+  gTegra2TokenSpaceGuid.PcdMipiFrameBufferHeight|600
+  gTegra2TokenSpaceGuid.PcdMipiFrameBufferPixelBpp|32
 
   gArmTokenSpaceGuid.PcdFdBaseAddress|0x01000000
   gArmTokenSpaceGuid.PcdFdSize|0x00200000

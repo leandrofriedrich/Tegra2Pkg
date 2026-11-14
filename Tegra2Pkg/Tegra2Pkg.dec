@@ -27,10 +27,10 @@
 
 [PcdsFixedAtBuild.common]
   # Simple FrameBuffer
-  gTegra2TokenSpaceGuid.PcdFrameBufferAddress|0x0|UINT32|0x0000a400
-  gTegra2TokenSpaceGuid.PcdFrameBufferWidth|0x0|UINT32|0x0000a401
-  gTegra2TokenSpaceGuid.PcdFrameBufferHeight|0x0|UINT32|0x0000a402
-  gTegra2TokenSpaceGuid.PcdFrameBufferBitsPerPixel|0x0|UINT32|0x0000a403
+  gTegra2TokenSpaceGuid.PcdMipiFrameBufferAddress|0x0|UINT32|0x0000a400
+  gTegra2TokenSpaceGuid.PcdMipiFrameBufferWidth|0x0|UINT32|0x0000a401
+  gTegra2TokenSpaceGuid.PcdMipiFrameBufferHeight|0x0|UINT32|0x0000a402
+  gTegra2TokenSpaceGuid.PcdMipiFrameBufferPixelBpp|0x0|UINT32|0x0000a403
 
   # Stack
   gArmTokenSpaceGuid.PcdCpuVectorBaseAddress|0x0|UINT32|0x0000003A

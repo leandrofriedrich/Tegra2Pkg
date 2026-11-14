@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: BSD-2-Clause
 # SimpleFbDxe.inf: Implements Simple FrameBuffer in UEFI.
 
 [Defines]
@@ -10,7 +9,7 @@
   ENTRY_POINT                    = SimpleFbDxeInitialize
 
 [BuildOptions.ARM]
-  GCC:*_*_*_CC_FLAGS = -Wno-pointer-to-int-cast -Wno-int-to-pointer-cast
+  GCC:*_*_*_CC_FLAGS = -Wno-pointer-to-int-cast -Wno-overflow -Wno-int-to-pointer-cast
 
 [Sources.common]
   SimpleFbDxe.c
@@ -18,29 +17,38 @@
 [Packages]
   MdePkg/MdePkg.dec
   MdeModulePkg/MdeModulePkg.dec
+  EmbeddedPkg/EmbeddedPkg.dec
+  ArmPkg/ArmPkg.dec
   Tegra2Pkg/Tegra2Pkg.dec
 
 [LibraryClasses]
   BaseLib
-  BaseMemoryLib
-  DebugLib
-  FrameBufferBltLib
-  MemoryAllocationLib
-  PcdLib
+  ReportStatusCodeLib
+  UefiLib
   UefiBootServicesTableLib
   UefiDriverEntryPoint
-  UefiLib
+  BaseMemoryLib
+  DebugLib
+  PcdLib
+  FrameBufferBltLib
+  CacheMaintenanceLib
 
 [Protocols]
-  gEfiDevicePathProtocolGuid
-  gEfiGraphicsOutputProtocolGuid       ## PRODUCES
-  gEfiCpuArchProtocolGuid              ## CONSUMES
+  gEfiGraphicsOutputProtocolGuid ## PRODUCES
+  gEfiCpuArchProtocolGuid
 
 [FixedPcd]
-  gTegra2TokenSpaceGuid.PcdFrameBufferAddress
-  gTegra2TokenSpaceGuid.PcdFrameBufferWidth
-  gTegra2TokenSpaceGuid.PcdFrameBufferHeight
-  gTegra2TokenSpaceGuid.PcdFrameBufferBitsPerPixel
+  gTegra2TokenSpaceGuid.PcdMipiFrameBufferAddress
+  gTegra2TokenSpaceGuid.PcdMipiFrameBufferWidth
+  gTegra2TokenSpaceGuid.PcdMipiFrameBufferHeight
+  gTegra2TokenSpaceGuid.PcdMipiFrameBufferPixelBpp
+
+[Guids]
+  gEfiMdeModulePkgTokenSpaceGuid
+
+[Pcd]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdVideoHorizontalResolution
+  gEfiMdeModulePkgTokenSpaceGuid.PcdVideoVerticalResolution
 
 [Depex]
   gEfiCpuArchProtocolGuid

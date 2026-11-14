@@ -1,0 +1,27 @@
+## @file
+#  FrameBufferConfigLib - Library to perform configuration of framebuffer format.
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = FrameBufferConfigLib
+  FILE_GUID                      = 243D3E8C-2780-4A25-9693-A410475BFCEF
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = FrameBufferConfigLib
+
+[Sources.common]
+  FrameBufferConfigLib.c
+
+[LibraryClasses]
+  ArmLib
+  BaseLib
+  BaseMemoryLib
+  DebugLib
+  IoLib
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  Tegra2Pkg/Tegra2Pkg.dec

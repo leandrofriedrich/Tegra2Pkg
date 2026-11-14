@@ -41,6 +41,7 @@
   PerformanceLib
   HobLib
   MemoryInitPeiLib
+  FrameBufferConfigLib
 
 [Pcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdFirmwareVersionString

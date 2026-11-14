@@ -18,6 +18,7 @@
 #include <Library/PrePiHobListPointerLib.h>
 #include <Library/PrePiLib.h>
 #include <Library/SerialPortLib.h>
+#include <Library/FrameBufferConfigLib.h>
 
 VOID EFIAPI ProcessLibraryConstructorList(VOID);
 
@@ -51,6 +52,9 @@ VOID Main(IN VOID *StackBase, IN UINTN StackSize)
   // Ensure transfers completed
   ArmInstructionSynchronizationBarrier();
   ArmDataMemoryBarrier();
+
+  // Reconfigure framebuffer
+  FrameBufferConfigLibConfigurePixelFormat();
 
   // Initialize UART.
   UartInit();
