@@ -1,0 +1,53 @@
+# SPDX-License-Identifier: BSD-2-Clause
+#/** @file
+#
+#  Copyright (c) 2011-2014, ARM Ltd. All rights reserved.<BR>
+#  Copyright (c) 2016, Linaro, Ltd. All rights reserved.<BR>
+#  This program and the accompanying materials
+#  are licensed and made available under the terms and conditions of the BSD License
+#  which accompanies this distribution.  The full text of the license may be found at
+#  http://opensource.org/licenses/bsd-license.php
+#
+#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#
+#**/
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = MemoryInitPeiLib
+  FILE_GUID                      = 7d1c5e42-3a9b-4e61-8f2d-5b0a9c6e1f73
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = MemoryInitPeiLib|SEC PEIM
+
+[Sources]
+  MemoryInitPeiLib.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  EmbeddedPkg/EmbeddedPkg.dec
+  ArmPkg/ArmPkg.dec
+  ArmPlatformPkg/ArmPlatformPkg.dec
+  UefiCpuPkg/UefiCpuPkg.dec
+  Tegra2Pkg/Tegra2Pkg.dec
+
+[LibraryClasses]
+  DebugLib
+  HobLib
+  ArmMmuLib
+  ArmPlatformLib
+
+[Guids]
+  gEfiMemoryTypeInformationGuid
+
+[FeaturePcd]
+  gEmbeddedTokenSpaceGuid.PcdPrePiProduceMemoryTypeInformationHob
+
+[FixedPcd]
+  gArmTokenSpaceGuid.PcdSystemMemoryBase
+  gArmTokenSpaceGuid.PcdSystemMemorySize
+
+[Depex]
+  TRUE

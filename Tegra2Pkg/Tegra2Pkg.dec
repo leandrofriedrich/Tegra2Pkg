@@ -1,0 +1,40 @@
+#
+#  Copyright (c) 2018, Linaro Limited. All rights reserved.
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+
+[Defines]
+  DEC_SPECIFICATION              = 0x0001001a
+  PACKAGE_NAME                   = Tegra2
+  PACKAGE_GUID                   = 24eeff8d-7438-406d-93be-cc693659e5f1
+  PACKAGE_VERSION                = Alpha
+
+################################################################################
+#
+# Include Section - list of Include Paths that are provided by this package.
+#                   Comments are used for Keywords and Module Types.
+#
+# Supported Module Types:
+#  BASE SEC PEI_CORE PEIM DXE_CORE DXE_DRIVER DXE_RUNTIME_DRIVER DXE_SMM_DRIVER DXE_SAL_DRIVER UEFI_DRIVER UEFI_APPLICATION
+#
+################################################################################
+[Includes.common]
+  Include                        # Root include for the package
+
+[Guids.common]
+  gTegra2TokenSpaceGuid          = { 0x2755e961, 0x20c7, 0x4d85, { 0x8e, 0xb6, 0x62, 0x7c, 0x94, 0xe4, 0xbe, 0x4e } }
+
+[PcdsFixedAtBuild.common]
+  # Simple FrameBuffer
+  gTegra2TokenSpaceGuid.PcdFrameBufferAddress|0x0|UINT32|0x0000a400
+  gTegra2TokenSpaceGuid.PcdFrameBufferWidth|0x0|UINT32|0x0000a401
+  gTegra2TokenSpaceGuid.PcdFrameBufferHeight|0x0|UINT32|0x0000a402
+  gTegra2TokenSpaceGuid.PcdFrameBufferBitsPerPixel|0x0|UINT32|0x0000a403
+
+  # Stack
+  gArmTokenSpaceGuid.PcdCpuVectorBaseAddress|0x0|UINT32|0x0000003A
+
+  # Memory allocation
+  gTegra2TokenSpaceGuid.PcdUefiMemPoolBase|0x0|UINT32|0x00000a106
+  gTegra2TokenSpaceGuid.PcdUefiMemPoolSize|0x0|UINT32|0x00000a107

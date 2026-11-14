@@ -1,0 +1,23 @@
+#/** @file
+#
+#  TimerLib for Tegra20.
+#
+#  Copyright (c) 2026, Leandro Friedrich.
+#  SPDX-License-Identifier: GPL-2.0-or-later
+#
+#**/
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = TimerLib
+  FILE_GUID                      = c3e7a4d2-5b91-4f6e-a2c8-7d1e9b3f5a60
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = TimerLib
+
+[Sources.common]
+  TimerLib.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  Tegra2Pkg/Tegra2Pkg.dec

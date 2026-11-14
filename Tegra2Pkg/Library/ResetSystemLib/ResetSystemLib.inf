@@ -1,0 +1,28 @@
+#/** @file
+#
+#  ResetSystemLib implementation for the Tegra20 PMC.
+#
+#  Copyright (c) 2026, Leandro Friedrich.
+#  SPDX-License-Identifier: GPL-2.0-or-later
+#
+#**/
+
+[Defines]
+  INF_VERSION                    = 0x0001001B
+  BASE_NAME                      = ResetSystemLib
+  FILE_GUID                      = 8D6F2E11-7A91-4E42-9C1A-2A6E3B7D5010
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = ResetSystemLib
+
+[Sources]
+  ResetSystemLib.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  Tegra2Pkg/Tegra2Pkg.dec
+
+[LibraryClasses]
+  BaseLib
+  IoLib

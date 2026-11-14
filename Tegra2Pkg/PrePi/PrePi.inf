@@ -1,0 +1,67 @@
+# SPDX-License-Identifier: BSD-2-Clause
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = PrePi
+  FILE_GUID                      = 2755e961-20c7-4d85-8eb6-627c94e4be4e
+  MODULE_TYPE                    = SEC
+  VERSION_STRING                 = 1.0
+
+[Sources.common]
+  Pi.c
+
+[Sources.ARM]
+  ModuleEntryPoint.S | GCC
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  EmbeddedPkg/EmbeddedPkg.dec
+  ArmPkg/ArmPkg.dec
+  ArmPlatformPkg/ArmPlatformPkg.dec
+  Tegra2Pkg/Tegra2Pkg.dec
+
+[LibraryClasses]
+  ArmLib
+  ArmPlatformLib
+  ArmMmuLib
+  BaseLib
+  DebugLib
+  IoLib
+  ExtractGuidedSectionLib
+  PeCoffGetEntryPointLib
+  PrePiHobListPointerLib
+  PrePiLib
+  PlatformPeiLib
+  CacheMaintenanceLib
+  DebugAgentLib
+  SerialPortLib
+  MemoryAllocationLib
+  PrePiMemoryAllocationLib
+  PerformanceLib
+  HobLib
+  MemoryInitPeiLib
+
+[Pcd]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFirmwareVersionString
+
+[FixedPcd]
+  gEfiMdePkgTokenSpaceGuid.PcdUartDefaultBaudRate
+  gEmbeddedTokenSpaceGuid.PcdPrePiStackBase
+  gEmbeddedTokenSpaceGuid.PcdPrePiStackSize
+  gArmTokenSpaceGuid.PcdFvBaseAddress
+  gArmTokenSpaceGuid.PcdFvSize
+  gArmTokenSpaceGuid.PcdFdBaseAddress
+  gArmTokenSpaceGuid.PcdFdSize
+  gArmTokenSpaceGuid.PcdCpuVectorBaseAddress
+  gArmPlatformTokenSpaceGuid.PcdCPUCorePrimaryStackSize
+  gArmPlatformTokenSpaceGuid.PcdSystemMemoryUefiRegionSize
+  gArmPlatformTokenSpaceGuid.PcdCoreCount
+  gEmbeddedTokenSpaceGuid.PcdPrePiCpuIoSize
+  gArmTokenSpaceGuid.PcdSystemMemoryBase
+  gArmTokenSpaceGuid.PcdSystemMemorySize
+  gTegra2TokenSpaceGuid.PcdUefiMemPoolBase
+  gTegra2TokenSpaceGuid.PcdUefiMemPoolSize
+
+[FeaturePcd]
+  gEmbeddedTokenSpaceGuid.PcdPrePiProduceMemoryTypeInformationHob

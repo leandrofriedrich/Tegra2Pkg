@@ -1,0 +1,31 @@
+#
+#  Copyright (c) 2018, Linaro Limited. All rights reserved.
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+
+[Defines]
+  INF_VERSION                    = 0x00010019
+  BASE_NAME                      = Tegra2Lib
+  FILE_GUID                      = 192a2eab-050c-4439-af55-09958f4714f0
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = ArmPlatformLib
+
+[Packages]
+  ArmPkg/ArmPkg.dec
+  ArmPlatformPkg/ArmPlatformPkg.dec
+  EmbeddedPkg/EmbeddedPkg.dec
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  Tegra2Pkg/Tegra2Pkg.dec
+
+[LibraryClasses]
+  ArmLib
+  HobLib
+  IoLib
+  MemoryAllocationLib
+  SerialPortLib
+
+[Sources.common]
+  PlatformLib.c

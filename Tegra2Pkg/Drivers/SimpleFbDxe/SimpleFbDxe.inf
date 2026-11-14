@@ -1,0 +1,46 @@
+# SPDX-License-Identifier: BSD-2-Clause
+# SimpleFbDxe.inf: Implements Simple FrameBuffer in UEFI.
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = SimpleFbDxe
+  FILE_GUID                      = dcfd1e6d-788d-4ffc-8e1b-ca2f75651a92
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = SimpleFbDxeInitialize
+
+[BuildOptions.ARM]
+  GCC:*_*_*_CC_FLAGS = -Wno-pointer-to-int-cast -Wno-int-to-pointer-cast
+
+[Sources.common]
+  SimpleFbDxe.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  Tegra2Pkg/Tegra2Pkg.dec
+
+[LibraryClasses]
+  BaseLib
+  BaseMemoryLib
+  DebugLib
+  FrameBufferBltLib
+  MemoryAllocationLib
+  PcdLib
+  UefiBootServicesTableLib
+  UefiDriverEntryPoint
+  UefiLib
+
+[Protocols]
+  gEfiDevicePathProtocolGuid
+  gEfiGraphicsOutputProtocolGuid       ## PRODUCES
+  gEfiCpuArchProtocolGuid              ## CONSUMES
+
+[FixedPcd]
+  gTegra2TokenSpaceGuid.PcdFrameBufferAddress
+  gTegra2TokenSpaceGuid.PcdFrameBufferWidth
+  gTegra2TokenSpaceGuid.PcdFrameBufferHeight
+  gTegra2TokenSpaceGuid.PcdFrameBufferBitsPerPixel
+
+[Depex]
+  gEfiCpuArchProtocolGuid

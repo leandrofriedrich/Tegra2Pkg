@@ -1,0 +1,24 @@
+Tegra2Pkg
+Copyright (c) 2026, Leandro Friedrich
+
+Original Tegra2Pkg code is licensed under GPL-2.0-or-later. See LICENSE.
+
+This project contains code derived from other projects. Those files retain
+their original copyright notices and licenses:
+
+- HtcHd2Pkg
+  Copyright (c) 2023, HTC-Leo-Revival-Project
+  BSD-2-Clause. See LICENSE.BSD-2-Clause.
+
+- TianoCore EDK2, ArmPkg, ArmPlatformPkg, EmbeddedPkg and UefiCpuPkg
+  Copyright held by TianoCore contributors, ARM Limited, Linaro Limited,
+  Intel Corporation, Red Hat, Inc., Apple Inc., Hewlett-Packard Company,
+  Google LLC and others as noted in the file headers.
+  BSD-2-Clause-Patent. See LICENSE.BSD-2-Clause-Patent.
+
+- LogoDxe
+  Copyright (c) 2016-2017, Intel Corporation.
+  BSD-2-Clause.
+
+See the SPDX-License-Identifier and copyright notices in each source file for
+the license that applies to that file.
