@@ -136,6 +136,8 @@ APRIORI DXE {
   # NVEC (EC keyboard)
   #
   INF Tegra2Pkg/Drivers/I2cDxe/I2cDxe.inf
+  INF Tegra2Pkg/Drivers/NvecDxe/NvecDxe.inf
+  INF Tegra2Pkg/Drivers/NvecKbdDxe/NvecKbdDxe.inf
 
   #
   # FAT filesystem + GPT/MBR partitioning

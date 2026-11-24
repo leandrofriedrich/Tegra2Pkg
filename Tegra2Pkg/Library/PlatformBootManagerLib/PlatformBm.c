@@ -36,6 +36,8 @@
 #include <Guid/EventGroup.h>
 #include <Guid/TtyTerm.h>
 
+#include <Tegra2/NvecKbd.h>
+
 #include "PlatformBm.h"
 
 #define DP_NODE_LEN(Type) { (UINT8)sizeof (Type), (UINT8)(sizeof (Type) >> 8) }
@@ -124,6 +126,20 @@ STATIC PLATFORM_USB_KEYBOARD mUsbKeyboard = {
   //
   // EFI_DEVICE_PATH_PROTOCOL End
   //
+  {
+    END_DEVICE_PATH_TYPE, END_ENTIRE_DEVICE_PATH_SUBTYPE,
+    DP_NODE_LEN (EFI_DEVICE_PATH_PROTOCOL)
+  }
+};
+
+STATIC CONST NVEC_KBD_DEVICE_PATH mNvecKeyboard = {
+  {
+    {
+      HARDWARE_DEVICE_PATH, HW_VENDOR_DP,
+      DP_NODE_LEN (VENDOR_DEVICE_PATH)
+    },
+    NVEC_KBD_DEVICE_PATH_GUID
+  },
   {
     END_DEVICE_PATH_TYPE, END_ENTIRE_DEVICE_PATH_SUBTYPE,
     DP_NODE_LEN (EFI_DEVICE_PATH_PROTOCOL)
@@ -658,6 +674,8 @@ PlatformBootManagerBeforeConsole (
   VOID
   )
 {
+  EFI_STATUS  Status;
+
   //
   // Signal EndOfDxe PI Event
   //
@@ -688,6 +706,14 @@ PlatformBootManagerBeforeConsole (
   //
   EfiBootManagerUpdateConsoleVariable (ConIn,
     (EFI_DEVICE_PATH_PROTOCOL *)&mUsbKeyboard, NULL);
+
+  //
+  // Add the NVEC keyboard device path to ConIn.
+  //
+  Status = EfiBootManagerUpdateConsoleVariable (ConIn,
+             (EFI_DEVICE_PATH_PROTOCOL *)&mNvecKeyboard, NULL);
+  DEBUG ((EFI_ERROR (Status) ? DEBUG_ERROR : DEBUG_INFO,
+    "%a: NVEC keyboard added to ConIn: %r\n", __FUNCTION__, Status));
 
   //
   // Add the hardcoded serial console device path to ConIn, ConOut, ErrOut.

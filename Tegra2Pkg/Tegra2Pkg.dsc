@@ -438,6 +438,8 @@
   # NVEC (EC keyboard)
   #
   Tegra2Pkg/Drivers/I2cDxe/I2cDxe.inf
+  Tegra2Pkg/Drivers/NvecDxe/NvecDxe.inf
+  Tegra2Pkg/Drivers/NvecKbdDxe/NvecKbdDxe.inf
 
   #
   # FAT filesystem + GPT/MBR partitioning

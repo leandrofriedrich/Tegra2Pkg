@@ -1,0 +1,38 @@
+## @file
+#  NVEC keyboard driver
+#
+#  Copyright (c) 2026, Leandro Friedrich.
+#  SPDX-License-Identifier: GPL-2.0-or-later
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010019
+  BASE_NAME                      = NvecKbdDxe
+  FILE_GUID                      = bf07c48e-8a52-4b2f-8e4f-aba55a8d7efe
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = NvecKbdInitialize
+
+[Sources.common]
+  NvecKbdDxe.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  Tegra2Pkg/Tegra2Pkg.dec
+
+[LibraryClasses]
+  BaseLib
+  BaseMemoryLib
+  DebugLib
+  MemoryAllocationLib
+  UefiBootServicesTableLib
+  UefiDriverEntryPoint
+  UefiLib
+
+[Protocols]
+  gEfiDevicePathProtocolGuid     ## PRODUCES
+  gEfiSimpleTextInProtocolGuid   ## PRODUCES
+  gNvecProtocolGuid        ## CONSUMES
+
+[Depex]
+  gNvecProtocolGuid
