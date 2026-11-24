@@ -1,5 +1,5 @@
 /** @file
-  Tegra20 hardware register definitions.
+  Tegra 2 hardware register definitions
 
   Copyright (c) 2026, Leandro Friedrich.
   SPDX-License-Identifier: GPL-2.0-or-later
@@ -28,6 +28,7 @@
 
 #define TEGRA2_PINMUX_TRISTATE     0x70000014
 #define TEGRA2_PINMUX_MUX          0x70000080
+#define TEGRA2_I2C3_BASE           0x7000C500
 #define TEGRA2_PMC_BASE            0x7000E400
 #define TEGRA2_MC_BASE             0x7000F000
 #define TEGRA2_EMC_BASE            0x7000F400

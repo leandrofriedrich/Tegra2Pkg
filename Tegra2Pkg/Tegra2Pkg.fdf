@@ -133,6 +133,11 @@ APRIORI DXE {
   INF MdeModulePkg/Bus/Sd/SdDxe/SdDxe.inf
 
   #
+  # NVEC (EC keyboard)
+  #
+  INF Tegra2Pkg/Drivers/I2cDxe/I2cDxe.inf
+
+  #
   # FAT filesystem + GPT/MBR partitioning
   #
   INF MdeModulePkg/Universal/Disk/UnicodeCollation/EnglishDxe/EnglishDxe.inf

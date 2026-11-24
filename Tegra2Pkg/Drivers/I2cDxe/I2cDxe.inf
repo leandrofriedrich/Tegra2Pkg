@@ -1,0 +1,34 @@
+## @file
+#  Minimal Tegra 2 I2C slave controller driver
+#
+#  Copyright (c) 2026, Leandro Friedrich.
+#  SPDX-License-Identifier: GPL-2.0-or-later
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010019
+  BASE_NAME                      = I2cDxe
+  FILE_GUID                      = 07a9d8b2-48bf-492a-a4f5-eb6bcd8ba389
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = I2cInitialize
+
+[Sources.common]
+  I2cDxe.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  Tegra2Pkg/Tegra2Pkg.dec
+
+[LibraryClasses]
+  BaseLib
+  DebugLib
+  IoLib
+  UefiBootServicesTableLib
+  UefiDriverEntryPoint
+
+[Protocols]
+  gI2cSlaveProtocolGuid    ## PRODUCES
+
+[Depex]
+  TRUE

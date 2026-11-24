@@ -435,6 +435,11 @@
   MdeModulePkg/Bus/Sd/SdDxe/SdDxe.inf
 
   #
+  # NVEC (EC keyboard)
+  #
+  Tegra2Pkg/Drivers/I2cDxe/I2cDxe.inf
+
+  #
   # FAT filesystem + GPT/MBR partitioning
   #
   MdeModulePkg/Universal/Disk/UnicodeCollation/EnglishDxe/EnglishDxe.inf
