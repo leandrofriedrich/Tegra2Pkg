@@ -9,7 +9,8 @@ heavily based on HtcHd2Pkg, which is based on Hikey960Pkg and many more, idk man
 Currently expected to be loaded from U-Boot, load to $loadaddr and go to it. 
 
 ## OS support
-  - none yet
+  - ReactOS: Boots to desktop!
+  - Windows: eta one day™
 
 ## Support status 
 
@@ -19,11 +20,26 @@ Currently expected to be loaded from U-Boot, load to $loadaddr and go to it.
 | Timer			|   ✅	 |
 | Interrupt Controller  |   ✅	 |
 | Serial		|   ✅   |
+| I2C			|   🟨   |
+| MMC			|   ✅   |
+| USB			|   ❌   |
+
+Notes:
+  - i2c is 🟨 because i only bothered with i2c slave support for nvec for now
 
 ### Device
 | Function      | Notes                            | status |
 |---------------|----------------------------------|--------|
 | Screen	| its just simplefb lol		   |   ✅   |
+| Keyboard	| Keyboard is done by (NV)EC	   |   🟨  |
+| eMMC          | didnt care enough yet            |   ❌ |
+| SD Card	| primary boot media		   |   ✅  |
+| USB device	| god no(t yet)			   |   ❌  |
+
+## Build notes
+
+ - builds against edk2 stable/202508 
+ - edk2-platforms at a5e5644d0e574da64ed908c7232d1cf5f6720c1f
 
 ## Credits
  - imbushuo for creating [PrimeG2Pkg](https://github.com/imbushuo/PrimeG2Pkg)
