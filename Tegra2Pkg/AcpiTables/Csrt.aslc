@@ -1,0 +1,40 @@
+/** @file
+  Core System Resource Table
+
+  Copyright (c) 2026, Leandro Friedrich.
+  SPDX-License-Identifier: GPL-2.0-or-later
+**/
+
+#include "Platform.h"
+
+#define CSRT_SIGNATURE       SIGNATURE_32('C','S','R','T')
+#define CSRT_VENDOR_NVDA     SIGNATURE_32('N','V','D','A')
+#define CSRT_TIMER_DEVICE_ID 0x0020U
+
+EFI_ACPI_5_0_CSRT_TABLE Csrt =
+{
+  //------------------------------------------------------------------------
+  // ACPI Table Header
+  //------------------------------------------------------------------------
+  ACPI_HEADER (CSRT_SIGNATURE, EFI_ACPI_5_0_CSRT_TABLE, EFI_ACPI_5_0_CSRT_REVISION),
+
+  //------------------------------------------------------------------------
+  // Timer resource group
+  //------------------------------------------------------------------------
+  {
+    sizeof (EFI_ACPI_5_0_CSRT_RESOURCE_GROUP_HEADER), // Resource Group Length
+    CSRT_VENDOR_NVDA,                                 // VendorId
+    0,                                                // SubvendorId
+    CSRT_TIMER_DEVICE_ID,                             // DeviceId
+    0,                                                // SubdeviceId
+    0,                                                // Revision
+    0,                                                // Reserved
+    0                                                 // SharedInfoLength
+  }
+};
+
+//
+// Reference the table being generated to prevent the optimizer from removing the
+// data structure from the executable
+//
+VOID* CONST ReferenceAcpiTable = &Csrt;

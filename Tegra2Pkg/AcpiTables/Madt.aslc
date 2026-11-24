@@ -1,0 +1,86 @@
+/** @file
+  Multiple APIC Description Table with GICv2
+
+  Copyright (c) 2026, Leandro Friedrich.
+  SPDX-License-Identifier: GPL-2.0-or-later
+**/
+
+#include <IndustryStandard/Acpi60.h>
+#include "Platform.h"
+
+#pragma pack (1)
+
+typedef struct {
+  EFI_ACPI_DESCRIPTION_HEADER Header;
+  UINT32 LocalApicAddress;
+  UINT32 Flags;
+  EFI_ACPI_6_0_GIC_STRUCTURE Gicc[2];
+  EFI_ACPI_6_0_GIC_DISTRIBUTOR_STRUCTURE Gicd;
+} EFI_ACPI_6_0_MULTIPLE_APIC_DESCRIPTION_TABLE;
+
+#pragma pack ()
+
+STATIC EFI_ACPI_6_0_MULTIPLE_APIC_DESCRIPTION_TABLE Madt =
+{
+  ACPI_HEADER (SIGNATURE_32 ('A', 'P', 'I', 'C'),
+               EFI_ACPI_6_0_MULTIPLE_APIC_DESCRIPTION_TABLE,
+               EFI_ACPI_6_0_MULTIPLE_APIC_DESCRIPTION_TABLE_REVISION),
+  0,                                                             // UINT32     LocalApicAddress
+  0,                                                             // UINT32     Flags
+  {
+    {
+      EFI_ACPI_6_0_GIC,
+      sizeof (EFI_ACPI_6_0_GIC_STRUCTURE),
+      0,
+      0,                                                         // UINT32     CPU Interface Number
+      0,                                                         // UINT32     ACPI Processor UID
+      EFI_ACPI_6_0_GIC_ENABLED,
+      0,                                                         // UINT32     Parking Protocol Version
+      0,                                                         // UINT32     Performance Interrupt GSIV
+      0,                                                         // UINT64     Parked Address
+      0x50040100,                                                // UINT64     GIC CPU Interface
+      0,                                                         // UINT64     GICV
+      0,                                                         // UINT64     GICH
+      0,                                                         // UINT32     VGIC Maintenance Interrupt
+      0,                                                         // UINT64     GICR Base
+      0x80000000,                                                // UINT64     MPIDR
+      0,                                                         // UINT8      Power Efficiency Class
+      { 0, 0, 0 }                                                // UINT8      Reserved[3]
+    },
+    {
+      EFI_ACPI_6_0_GIC,
+      sizeof (EFI_ACPI_6_0_GIC_STRUCTURE),
+      0,
+      1,                                                         // UINT32     CPU Interface Number
+      1,                                                         // UINT32     ACPI Processor UID
+      EFI_ACPI_6_0_GIC_ENABLED,
+      0,
+      0,
+      0,
+      0x50040100,
+      0,
+      0,
+      0,
+      0,
+      0x80000001,
+      0,
+      { 0, 0, 0 }
+    }
+  },
+  {
+    EFI_ACPI_6_0_GICD,
+    sizeof (EFI_ACPI_6_0_GIC_DISTRIBUTOR_STRUCTURE),
+    0,
+    0,                                                          // UINT32     GIC ID
+    0x50041000,                                                 // UINT64     Distributor Base
+    0,                                                          // UINT32     System Vector Base
+    EFI_ACPI_6_0_GIC_V2,
+    { 0, 0, 0 }
+  }
+};
+
+//
+// Reference the table being generated to prevent the optimizer from removing the
+// data structure from the executable
+//
+VOID* CONST ReferenceAcpiTable = &Madt;

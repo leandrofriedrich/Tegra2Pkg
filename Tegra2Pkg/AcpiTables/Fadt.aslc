@@ -1,0 +1,83 @@
+/** @file
+  Fixed ACPI Description Table
+
+  Copyright (c) 2026, Leandro Friedrich.
+  SPDX-License-Identifier: GPL-2.0-or-later
+**/
+
+#include <IndustryStandard/Acpi.h>
+#include "Platform.h"
+
+// fadt based on harmony firmware
+
+EFI_ACPI_2_0_FIXED_ACPI_DESCRIPTION_TABLE Fadt =
+{
+  {
+    EFI_ACPI_2_0_FIXED_ACPI_DESCRIPTION_TABLE_SIGNATURE,
+    sizeof (EFI_ACPI_2_0_FIXED_ACPI_DESCRIPTION_TABLE),
+    0x05,                                                          // UINT8      Revision
+    0,                                                             // UINT8      Checksum
+    EFI_ACPI_OEM_ID,                                               // UINT8      OEMID[6]
+    EFI_ACPI_OEM_TABLE_ID,                                         // UINT64     OEMTableID
+    EFI_ACPI_OEM_REVISION,                                         // UINT32     OEMRevision
+    EFI_ACPI_CREATOR_ID,                                           // UINT32     CreatorID
+    EFI_ACPI_CREATOR_REVISION                                      // UINT32     CreatorRevision
+  },
+  0,                                                             // UINT32     FirmwareCtrl
+  0,                                                             // UINT32     Dsdt
+  0x01,                                                          // UINT8      Reserved0
+  EFI_ACPI_2_0_PM_PROFILE_UNSPECIFIED,                           // UINT8      PreferredPmProfile
+  0x0009,                                                        // UINT16     SciInt
+  0,                                                             // UINT32     SmiCmd
+  0xE1,                                                          // UINT8      AcpiEnable
+  0x1E,                                                          // UINT8      AcpiDisable
+  0,                                                             // UINT8      S4BiosReq
+  0xE2,                                                          // UINT8      PstateCnt
+  0x00000400,                                                    // UINT32     Pm1aEvtBlk
+  0,                                                             // UINT32     Pm1bEvtBlk
+  0x00000404,                                                    // UINT32     Pm1aCntBlk
+  0,                                                             // UINT32     Pm1bCntBlk
+  0x00000022,                                                    // UINT32     Pm2CntBlk
+  0x00000408,                                                    // UINT32     PmTmrBlk
+  0x0000040C,                                                    // UINT32     Gpe0Blk
+  0,                                                             // UINT32     Gpe1Blk
+  0x04,                                                          // UINT8      Pm1EvtLen
+  0x02,                                                          // UINT8      Pm1CntLen
+  0x01,                                                          // UINT8      Pm2CntLen
+  0x04,                                                          // UINT8      PmTmrLen
+  0x04,                                                          // UINT8      Gpe0BlkLen
+  0,                                                             // UINT8      Gpe1BlkLen
+  0,                                                             // UINT8      Gpe1Base
+  0xE3,                                                          // UINT8      CstCnt
+  0x0065,                                                        // UINT16     PLvl2Lat
+  0x03E9,                                                        // UINT16     PLvl3Lat
+  0x0400,                                                        // UINT16     FlushSize
+  0x0010,                                                        // UINT16     FlushStride
+  0,                                                             // UINT8      DutyOffset
+  0,                                                             // UINT8      DutyWidth
+  0x0D,                                                          // UINT8      DayAlrm
+  0,                                                             // UINT8      MonAlrm
+  0,                                                             // UINT8      Century
+  0x0003,                                                        // UINT16     IaPcBootArch
+  0,                                                             // UINT8      Reserved1
+  0x001001A5,                                                    // UINT32     Flags
+  { 0 },                                                         // EFI_ACPI_2_0_GENERIC_ADDRESS_STRUCTURE  ResetReg
+  0,                                                             // UINT8      ResetValue
+  { 0, 0, 0 },                                                   // UINT8      Reserved2[3]
+  0,                                                             // UINT64     XFirmwareCtrl
+  0,                                                             // UINT64     XDsdt
+  { 0 },                                                         // EFI_ACPI_2_0_GENERIC_ADDRESS_STRUCTURE  XPm1aEvtBlk
+  { 0 },                                                         // EFI_ACPI_2_0_GENERIC_ADDRESS_STRUCTURE  XPm1bEvtBlk
+  { 0 },                                                         // EFI_ACPI_2_0_GENERIC_ADDRESS_STRUCTURE  XPm1aCntBlk
+  { 0 },                                                         // EFI_ACPI_2_0_GENERIC_ADDRESS_STRUCTURE  XPm1bCntBlk
+  { 0 },                                                         // EFI_ACPI_2_0_GENERIC_ADDRESS_STRUCTURE  XPm2CntBlk
+  { 0 },                                                         // EFI_ACPI_2_0_GENERIC_ADDRESS_STRUCTURE  XPmTmrBlk
+  { 0 },                                                         // EFI_ACPI_2_0_GENERIC_ADDRESS_STRUCTURE  XGpe0Blk
+  { 0 }                                                          // EFI_ACPI_2_0_GENERIC_ADDRESS_STRUCTURE  XGpe1Blk
+};
+
+//
+// Reference the table being generated to prevent the optimizer from removing the
+// data structure from the executable
+//
+VOID* CONST ReferenceAcpiTable = &Fadt;
