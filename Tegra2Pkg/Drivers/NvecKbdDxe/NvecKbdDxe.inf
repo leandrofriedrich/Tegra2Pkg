@@ -30,9 +30,10 @@
   UefiLib
 
 [Protocols]
-  gEfiDevicePathProtocolGuid     ## PRODUCES
-  gEfiSimpleTextInProtocolGuid   ## PRODUCES
-  gNvecProtocolGuid        ## CONSUMES
+  gEfiDevicePathProtocolGuid       ## PRODUCES
+  gEfiSimpleTextInProtocolGuid     ## PRODUCES
+  gEfiSimpleTextInputExProtocolGuid ## PRODUCES
+  gNvecProtocolGuid                ## CONSUMES
 
 [Depex]
   gNvecProtocolGuid

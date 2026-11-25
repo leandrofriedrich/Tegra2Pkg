@@ -16,6 +16,7 @@
 
 #include <Protocol/DevicePath.h>
 #include <Protocol/SimpleTextIn.h>
+#include <Protocol/SimpleTextInEx.h>
 #include <Protocol/Nvec.h>
 
 #include <Tegra2/NvecKbd.h>
@@ -38,25 +39,39 @@ typedef struct {
 } NVEC_KBD_KEY;
 
 typedef struct {
-  EFI_SIMPLE_TEXT_INPUT_PROTOCOL  ConIn;
-  NVEC_PROTOCOL            *Nvec;
-  EFI_EVENT                       Timer;
-  EFI_EVENT                       WaitForKey;
-  EFI_INPUT_KEY                   Queue[NVEC_KBD_QUEUE_SIZE];
-  UINTN                           QueueHead;
-  UINTN                           QueueTail;
-  NVEC_KBD_KEY             Keys[NVEC_KBD_KEY_COUNT];
-  UINTN                           RepeatKey;
-  UINT32                          Now;
-  BOOLEAN                         RepeatPending;
-  BOOLEAN                         LeftCtrl;
-  BOOLEAN                         RightCtrl;
-  BOOLEAN                         LeftShift;
-  BOOLEAN                         RightShift;
-  BOOLEAN                         CapsLock;
+  LIST_ENTRY                  NotifyEntry;
+  EFI_KEY_DATA                KeyData;
+  EFI_KEY_NOTIFY_FUNCTION     KeyNotificationFn;
+} NVEC_KBD_KEY_NOTIFY;
+
+typedef struct {
+  EFI_SIMPLE_TEXT_INPUT_PROTOCOL     ConIn;
+  EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL  ConInEx;
+  NVEC_PROTOCOL                      *Nvec;
+  EFI_EVENT                          Timer;
+  EFI_EVENT                          WaitForKey;
+  EFI_EVENT                          KeyNotifyEvent;
+  EFI_INPUT_KEY                      Queue[NVEC_KBD_QUEUE_SIZE];
+  UINTN                              QueueHead;
+  UINTN                              QueueTail;
+  EFI_INPUT_KEY                      NotifyQueue[NVEC_KBD_QUEUE_SIZE];
+  UINTN                              NotifyHead;
+  UINTN                              NotifyTail;
+  LIST_ENTRY                         NotifyList;
+  EFI_KEY_TOGGLE_STATE               ToggleState;
+  NVEC_KBD_KEY                       Keys[NVEC_KBD_KEY_COUNT];
+  UINTN                              RepeatKey;
+  UINT32                             Now;
+  BOOLEAN                            RepeatPending;
+  BOOLEAN                            LeftCtrl;
+  BOOLEAN                            RightCtrl;
+  BOOLEAN                            LeftShift;
+  BOOLEAN                            RightShift;
+  BOOLEAN                            CapsLock;
 } NVEC_KBD;
 
-#define NVEC_KBD_FROM_THIS(a)  BASE_CR (a, NVEC_KBD, ConIn)
+#define NVEC_KBD_FROM_THIS(a)     BASE_CR (a, NVEC_KBD, ConIn)
+#define NVEC_KBD_FROM_THIS_EX(a)  BASE_CR (a, NVEC_KBD, ConInEx)
 
 STATIC CONST NVEC_KBD_DEVICE_PATH  mNvecKbdDevicePath = {
   {
@@ -185,9 +200,57 @@ STATIC CONST NVEC_KEY  mExtKeyMap[0x80] = {
 };
 
 STATIC
+BOOLEAN
+NvecKbdIsKeyRegistered (
+  IN EFI_KEY_DATA  *RegisteredData,
+  IN EFI_KEY_DATA  *InputData
+  )
+{
+  if ((RegisteredData->Key.ScanCode != InputData->Key.ScanCode) ||
+      (RegisteredData->Key.UnicodeChar != InputData->Key.UnicodeChar)) {
+    return FALSE;
+  }
+
+  return TRUE;
+}
+
+STATIC
+VOID
+NvecKbdNotifyKey (
+  IN NVEC_KBD            *Kbd,
+  IN CONST EFI_INPUT_KEY *Key
+  )
+{
+  LIST_ENTRY             *Link;
+  NVEC_KBD_KEY_NOTIFY    *Notify;
+  EFI_KEY_DATA           KeyData;
+  UINTN                  Next;
+
+  KeyData.Key = *Key;
+  KeyData.KeyState.KeyShiftState = 0;
+  KeyData.KeyState.KeyToggleState = 0;
+
+  for (Link = GetFirstNode (&Kbd->NotifyList);
+       !IsNull (&Kbd->NotifyList, Link);
+       Link = GetNextNode (&Kbd->NotifyList, Link)) {
+    Notify = BASE_CR (Link, NVEC_KBD_KEY_NOTIFY, NotifyEntry);
+    if (NvecKbdIsKeyRegistered (&Notify->KeyData, &KeyData)) {
+      Next = (Kbd->NotifyTail + 1) % NVEC_KBD_QUEUE_SIZE;
+      if (Next == Kbd->NotifyHead) {
+        Kbd->NotifyHead = (Kbd->NotifyHead + 1) % NVEC_KBD_QUEUE_SIZE;
+      }
+      Kbd->NotifyQueue[Kbd->NotifyTail] = *Key;
+      Kbd->NotifyTail = Next;
+      gBS->SignalEvent (Kbd->KeyNotifyEvent);
+      break;
+    }
+  }
+}
+
+STATIC
 VOID
 NvecKbdPush (
-  IN NVEC_KBD   *Kbd,
+  IN NVEC_KBD             *Kbd,
   IN CONST EFI_INPUT_KEY  *Key
   )
 {
@@ -200,6 +263,8 @@ NvecKbdPush (
 
   Kbd->Queue[Kbd->QueueTail] = *Key;
   Kbd->QueueTail             = Next;
+
+  NvecKbdNotifyKey (Kbd, Key);
 }
 
 STATIC
@@ -555,6 +620,171 @@ NvecKbdReadKeyStroke (
   return EFI_SUCCESS;
 }
 
+STATIC
+VOID
+EFIAPI
+NvecKbdKeyNotifyProcess (
+  IN EFI_EVENT  Event,
+  IN VOID       *Context
+  )
+{
+  NVEC_KBD            *Kbd;
+  LIST_ENTRY          *Link;
+  NVEC_KBD_KEY_NOTIFY *Notify;
+  EFI_KEY_DATA        KeyData;
+  EFI_INPUT_KEY       Key;
+  EFI_TPL             OldTpl;
+
+  Kbd = Context;
+
+  while (TRUE) {
+    OldTpl = gBS->RaiseTPL (TPL_NOTIFY);
+    if (Kbd->NotifyHead == Kbd->NotifyTail) {
+      gBS->RestoreTPL (OldTpl);
+      break;
+    }
+    Key = Kbd->NotifyQueue[Kbd->NotifyHead];
+    Kbd->NotifyHead = (Kbd->NotifyHead + 1) % NVEC_KBD_QUEUE_SIZE;
+    gBS->RestoreTPL (OldTpl);
+
+    KeyData.Key = Key;
+    KeyData.KeyState.KeyShiftState = 0;
+    KeyData.KeyState.KeyToggleState = 0;
+
+    for (Link = GetFirstNode (&Kbd->NotifyList);
+         !IsNull (&Kbd->NotifyList, Link);
+         Link = GetNextNode (&Kbd->NotifyList, Link)) {
+      Notify = BASE_CR (Link, NVEC_KBD_KEY_NOTIFY, NotifyEntry);
+      if (NvecKbdIsKeyRegistered (&Notify->KeyData, &KeyData)) {
+        Notify->KeyNotificationFn (&KeyData);
+      }
+    }
+  }
+}
+
+STATIC
+EFI_STATUS
+EFIAPI
+NvecKbdResetEx (
+  IN EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL  *This,
+  IN BOOLEAN                            ExtendedVerification
+  )
+{
+  return NvecKbdReset (&NVEC_KBD_FROM_THIS_EX (This)->ConIn, ExtendedVerification);
+}
+
+STATIC
+EFI_STATUS
+EFIAPI
+NvecKbdReadKeyStrokeEx (
+  IN EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL  *This,
+  OUT EFI_KEY_DATA                      *KeyData
+  )
+{
+  NVEC_KBD  *Kbd;
+  EFI_STATUS Status;
+
+  Kbd = NVEC_KBD_FROM_THIS_EX (This);
+  Status = NvecKbdReadKeyStroke (&Kbd->ConIn, &KeyData->Key);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  KeyData->KeyState.KeyShiftState = 0;
+  KeyData->KeyState.KeyToggleState = Kbd->ToggleState;
+  return EFI_SUCCESS;
+}
+
+STATIC
+EFI_STATUS
+EFIAPI
+NvecKbdSetState (
+  IN EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL  *This,
+  IN EFI_KEY_TOGGLE_STATE               *KeyToggleState
+  )
+{
+  NVEC_KBD  *Kbd;
+
+  Kbd = NVEC_KBD_FROM_THIS_EX (This);
+  Kbd->ToggleState = *KeyToggleState;
+  return EFI_SUCCESS;
+}
+
+STATIC
+EFI_STATUS
+EFIAPI
+NvecKbdRegisterKeyNotify (
+  IN EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL  *This,
+  IN EFI_KEY_DATA                       *KeyData,
+  IN EFI_KEY_NOTIFY_FUNCTION            KeyNotificationFunction,
+  OUT VOID                              **NotifyHandle
+  )
+{
+  NVEC_KBD            *Kbd;
+  NVEC_KBD_KEY_NOTIFY *Notify;
+  LIST_ENTRY          *Link;
+
+  if ((KeyData == NULL) || (NotifyHandle == NULL) || (KeyNotificationFunction == NULL)) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  Kbd = NVEC_KBD_FROM_THIS_EX (This);
+
+  for (Link = GetFirstNode (&Kbd->NotifyList);
+       !IsNull (&Kbd->NotifyList, Link);
+       Link = GetNextNode (&Kbd->NotifyList, Link)) {
+    Notify = BASE_CR (Link, NVEC_KBD_KEY_NOTIFY, NotifyEntry);
+    if (NvecKbdIsKeyRegistered (&Notify->KeyData, KeyData) &&
+        Notify->KeyNotificationFn == KeyNotificationFunction) {
+      *NotifyHandle = Notify;
+      return EFI_SUCCESS;
+    }
+  }
+
+  Notify = AllocateZeroPool (sizeof (*Notify));
+  if (Notify == NULL) {
+    return EFI_OUT_OF_RESOURCES;
+  }
+
+  Notify->KeyNotificationFn = KeyNotificationFunction;
+  CopyMem (&Notify->KeyData, KeyData, sizeof (EFI_KEY_DATA));
+  InsertTailList (&Kbd->NotifyList, &Notify->NotifyEntry);
+  *NotifyHandle = Notify;
+  return EFI_SUCCESS;
+}
+
+STATIC
+EFI_STATUS
+EFIAPI
+NvecKbdUnregisterKeyNotify (
+  IN EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL  *This,
+  IN VOID                               *NotifyHandle
+  )
+{
+  NVEC_KBD            *Kbd;
+  NVEC_KBD_KEY_NOTIFY *Notify;
+  LIST_ENTRY          *Link;
+
+  if (NotifyHandle == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  Kbd = NVEC_KBD_FROM_THIS_EX (This);
+
+  for (Link = GetFirstNode (&Kbd->NotifyList);
+       !IsNull (&Kbd->NotifyList, Link);
+       Link = GetNextNode (&Kbd->NotifyList, Link)) {
+    Notify = BASE_CR (Link, NVEC_KBD_KEY_NOTIFY, NotifyEntry);
+    if (Notify == NotifyHandle) {
+      RemoveEntryList (&Notify->NotifyEntry);
+      FreePool (Notify);
+      return EFI_SUCCESS;
+    }
+  }
+
+  return EFI_INVALID_PARAMETER;
+}
+
 EFI_STATUS
 EFIAPI
 NvecKbdInitialize (
@@ -580,8 +810,15 @@ NvecKbdInitialize (
     return Status;
   }
 
-  Kbd->ConIn.Reset        = NvecKbdReset;
+  Kbd->ConIn.Reset         = NvecKbdReset;
   Kbd->ConIn.ReadKeyStroke = NvecKbdReadKeyStroke;
+
+  Kbd->ConInEx.Reset                = NvecKbdResetEx;
+  Kbd->ConInEx.ReadKeyStrokeEx      = NvecKbdReadKeyStrokeEx;
+  Kbd->ConInEx.SetState             = NvecKbdSetState;
+  Kbd->ConInEx.RegisterKeyNotify    = NvecKbdRegisterKeyNotify;
+  Kbd->ConInEx.UnregisterKeyNotify  = NvecKbdUnregisterKeyNotify;
+  InitializeListHead (&Kbd->NotifyList);
 
   Status = gBS->CreateEvent (
                   EVT_NOTIFY_WAIT,
@@ -594,8 +831,21 @@ NvecKbdInitialize (
     FreePool (Kbd);
     return Status;
   }
-
   Kbd->ConIn.WaitForKey = Kbd->WaitForKey;
+  Kbd->ConInEx.WaitForKeyEx = NULL;
+
+  Status = gBS->CreateEvent (
+                  EVT_NOTIFY_SIGNAL,
+                  TPL_CALLBACK,
+                  NvecKbdKeyNotifyProcess,
+                  Kbd,
+                  &Kbd->KeyNotifyEvent
+                  );
+  if (EFI_ERROR (Status)) {
+    gBS->CloseEvent (Kbd->WaitForKey);
+    FreePool (Kbd);
+    return Status;
+  }
 
   Kbd->Nvec->SetEventHandler (Kbd->Nvec, NvecKbdEventHandler, Kbd);
 
@@ -622,6 +872,7 @@ NvecKbdInitialize (
                   &Kbd->Timer
                   );
   if (EFI_ERROR (Status)) {
+    gBS->CloseEvent (Kbd->KeyNotifyEvent);
     gBS->CloseEvent (Kbd->WaitForKey);
     FreePool (Kbd);
     return Status;
@@ -630,6 +881,7 @@ NvecKbdInitialize (
   Status = gBS->SetTimer (Kbd->Timer, TimerPeriodic, EFI_TIMER_PERIOD_MILLISECONDS (NVEC_KBD_POLL_MS));
   if (EFI_ERROR (Status)) {
     gBS->CloseEvent (Kbd->Timer);
+    gBS->CloseEvent (Kbd->KeyNotifyEvent);
     gBS->CloseEvent (Kbd->WaitForKey);
     FreePool (Kbd);
     return Status;
@@ -640,12 +892,15 @@ NvecKbdInitialize (
                   &Handle,
                   &gEfiSimpleTextInProtocolGuid,
                   &Kbd->ConIn,
+                  &gEfiSimpleTextInputExProtocolGuid,
+                  &Kbd->ConInEx,
                   &gEfiDevicePathProtocolGuid,
                   &mNvecKbdDevicePath,
                   NULL
                   );
   if (EFI_ERROR (Status)) {
     gBS->CloseEvent (Kbd->Timer);
+    gBS->CloseEvent (Kbd->KeyNotifyEvent);
     gBS->CloseEvent (Kbd->WaitForKey);
     FreePool (Kbd);
   }
